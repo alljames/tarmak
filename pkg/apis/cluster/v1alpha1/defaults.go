@@ -133,6 +133,13 @@ func allocateAmazonESProxyPort(loggingSinks []*LoggingSink) int {
 
 }
 
+func SetDefaults_Encryption(obj *Cluster) {
+	// EBS encryption
+	if obj.Amazon.EBSEncryption == nil {
+		obj.Amazon.EBSEncryption = boolPointer(false) // TODO: ensure this is reeflected in zz_generated.defaults.go
+	}
+}
+
 func SetDefaults_Volume(obj *Volume) {
 	// set creation time, if unset
 	if obj.CreationTimestamp == zeroTime {

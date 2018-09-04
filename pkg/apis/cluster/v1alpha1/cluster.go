@@ -74,6 +74,7 @@ type ClusterAmazon struct {
 	// This fields contains ARNs for additional IAM policies to be added to this
 	// instance pool
 	AdditionalIAMPolicies []string `json:"additionalIAMPolicies,omitempty"`
+	EBSEncryption         *bool    `json:"ebsEncryption,omitempty"`
 }
 
 type ClusterKubernetes struct {
