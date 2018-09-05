@@ -39,7 +39,7 @@ func (p *Packer) images() (images []*image) {
 			tarmak:      p.tarmak,
 		}
 		image.log = p.log
-		for key, val := range image.tags() {
+		for key, val := range image.userVariables() {
 			image.log = image.log.WithField(key, val)
 		}
 

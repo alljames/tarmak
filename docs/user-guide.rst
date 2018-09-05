@@ -354,8 +354,8 @@ EBS Encryption
 ~~~~~~~~~~~~~~
 
 AWS offers encrypted EBS (Elastic Block Storage). Details regarding EBS can be
-found `here<https://aws.amazon.com/ebs/details/>`_. The following `tarmak.yaml`
-snippet shows how to enable encrypted EBS.
+found `here<https://aws.amazon.com/ebs/details/>`_, while Amazon EBS Encryption is described `here<https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html>`_. 
+The following `tarmak.yaml` snippet shows how to enable encrypted EBS.
 
 .. code-block:: yaml
 
