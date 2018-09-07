@@ -30,6 +30,8 @@ variable "vault_root_size" {}
 
 variable "vault_data_size" {}
 
+variable "vault_volume_encryped" {}
+
 variable "vault_min_instance_count" {}
 
 variable "vault_instance_type" {}

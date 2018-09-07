@@ -96,7 +96,7 @@ type Environment interface {
 	// return the cluster which is the hub
 	Hub() Cluster
 
-	// return the vaullt for the environment
+	// return the vault for the environment
 	Vault() Vault
 }
 
@@ -261,6 +261,7 @@ type Volume interface {
 	Size() int
 	Type() string
 	Device() string
+	Encrypted() bool
 }
 
 type Initialize interface {

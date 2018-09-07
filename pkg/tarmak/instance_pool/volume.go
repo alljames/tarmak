@@ -51,3 +51,7 @@ func (v *Volume) Size() int {
 func (v *Volume) Type() string {
 	return v.volumeType
 }
+
+// func (v *Volume) Encrypted() string {
+// 	return // TODO:
+// }

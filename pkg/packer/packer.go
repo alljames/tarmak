@@ -68,6 +68,7 @@ func (p *Packer) Build() error {
 	return nil
 }
 
+// TODO: Aled - can this function be used to query encryption?
 // Query images
 func (p *Packer) IDs() (map[string]string, error) {
 	images, err := p.List()
