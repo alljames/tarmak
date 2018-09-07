@@ -72,9 +72,10 @@ resource "aws_launch_configuration" "{{.TFName}}" {
 
 {{ range .Volumes -}}
   ebs_block_device {
-    device_name = "{{.Device}}"
-    volume_size = {{.Size}}
-    volume_type = "{{.Type}}" // TODO: add encrypted = "true"HERE
+    device_name       = "{{.Device}}"
+    volume_size       = {{.Size}}
+    volume_type       = "{{.Type}}"
+    volume_encrypted  = "{{.Encrypted}}" // TODO: Aled - where is this populated from?
   }
 {{ end -}}
 
