@@ -75,7 +75,7 @@ resource "aws_launch_configuration" "{{.TFName}}" {
     device_name       = "{{.Device}}"
     volume_size       = {{.Size}}
     volume_type       = "{{.Type}}"
-    volume_encrypted  = "{{.Encrypted}}" // TODO: Aled - where is this populated from?
+    volume_encrypted  = "{{.Encrypted}}"
   }
 {{ end -}}
 
