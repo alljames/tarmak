@@ -353,15 +353,17 @@ Both of those outputs can then be used in the tarmak configuration:
 EBS Encryption
 ~~~~~~~~~~~~~~
 
-AWS offers encrypted EBS (Elastic Block Storage). Details regarding EBS can be
-found `here<https://aws.amazon.com/ebs/details/>`_, while Amazon EBS Encryption is described `here<https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html>`_. 
+AWS offers encrypted EBS (Elastic Block Storage); however, this is not 
+enabled by Tarmak by default. Details regarding EBS can be found 
+`here<https://aws.amazon.com/ebs/details/>`_,  while Amazon EBS Encryption 
+is described `here<https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html>`_. 
 The following `tarmak.yaml` snippet shows how to enable encrypted EBS.
 
 .. code-block:: yaml
 
     clusters:
     - amazon:
-        ebsEncryption: true
+        ebsEncrypted: true
     ...
 
 OIDC Authentication
