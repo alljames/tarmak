@@ -174,6 +174,7 @@ func (t *terraformTemplate) data(module string) map[string]interface{} {
 		"ClusterTypeClusterMulti":  clusterv1alpha1.ClusterTypeClusterMulti,
 		"ClusterType":              t.cluster.Type(),
 		"InstancePools":            t.cluster.InstancePools(),
+		"ebsEncrypted":             *t.cluster.Config().Amazon.EBSEncrypted,
 		"ExistingVPC":              existingVPC,
 		// cluster.Roles() returns a list of roles based off of the types of instancePools in tarmak.yaml
 		"Roles":                 t.cluster.Roles(),

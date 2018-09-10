@@ -15,6 +15,7 @@ type Volume struct {
 
 	volumeType string
 	device     string
+	encrypted  bool
 }
 
 func NewVolumeFromConfig(pos int, provider interfaces.Provider, conf *clusterv1alpha1.Volume) (*Volume, error) {
@@ -52,6 +53,6 @@ func (v *Volume) Type() string {
 	return v.volumeType
 }
 
-// func (v *Volume) Encrypted() string {
-// 	return // TODO:
-// }
+func (v *Volume) Encrypted() bool {
+	return v.encrypted
+}

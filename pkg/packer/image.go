@@ -42,8 +42,8 @@ func (i *image) userVariables() map[string]string {
 	return map[string]string{
 		tarmakv1alpha1.ImageTagEnvironment:   i.environment,
 		tarmakv1alpha1.ImageTagBaseImageName: i.imageName,
-		"region":               i.tarmak.Provider().Region(),
-		"ebs_volume_encrypted": fmt.Sprintf("%v", i.tarmak.Cluster().Config().Amazon.EBSEncryption),
+		"region":                             i.tarmak.Provider().Region(),
+		"ebs_volume_encrypted":               fmt.Sprintf("%v", i.tarmak.Cluster().Config().Amazon.EBSEncrypted),
 	}
 }
 
