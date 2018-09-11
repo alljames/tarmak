@@ -37,6 +37,21 @@ func SetObjectDefaults_Config(in *Config) {
 				cluster_v1alpha1.SetDefaults_Volume(c)
 			}
 		}
+		if a.Kubernetes != nil {
+			if a.Kubernetes.ClusterAutoscaler != nil {
+				cluster_v1alpha1.SetDefaults_ClusterKubernetesClusterAutoscaler(a.Kubernetes.ClusterAutoscaler)
+			}
+			if a.Kubernetes.APIServer != nil {
+				if a.Kubernetes.APIServer.Amazon != nil {
+					if a.Kubernetes.APIServer.Amazon.PublicELBAccessLogs != nil {
+						cluster_v1alpha1.SetDefaults_ClusterKubernetesAPIServerAmazonAccessLogs(a.Kubernetes.APIServer.Amazon.PublicELBAccessLogs)
+					}
+					if a.Kubernetes.APIServer.Amazon.InternalELBAccessLogs != nil {
+						cluster_v1alpha1.SetDefaults_ClusterKubernetesAPIServerAmazonAccessLogs(a.Kubernetes.APIServer.Amazon.InternalELBAccessLogs)
+					}
+				}
+			}
+		}
 	}
 	for i := range in.Providers {
 		a := &in.Providers[i]

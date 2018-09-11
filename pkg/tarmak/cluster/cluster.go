@@ -2,6 +2,7 @@
 package cluster
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"path/filepath"
@@ -66,9 +67,19 @@ func NewFromConfig(environment interfaces.Environment, conf *clusterv1alpha1.Clu
 
 	// populate role information if the API server should be public
 	if k := cluster.Config().Kubernetes; k != nil {
-		if apiServer := k.APIServer; apiServer != nil && apiServer.Public == true {
+		if apiServer := k.APIServer; apiServer != nil {
 			if master := cluster.Role("master"); master != nil {
-				master.AWS.ELBAPIPublic = true
+
+				if apiServer.Public == true {
+					master.AWS.ELBAPIPublic = true
+					if a := apiServer.Amazon; a != nil && a.PublicELBAccessLogs != nil {
+						master.AWS.EnablePublicELBAccessLogs = *a.PublicELBAccessLogs.Enabled
+					}
+				}
+
+				if a := apiServer.Amazon; a != nil && a.InternalELBAccessLogs != nil {
+					master.AWS.EnableInternalELBAccessLogs = *a.InternalELBAccessLogs.Enabled
+				}
 			}
 		}
 	}
@@ -129,6 +140,7 @@ func (c *Cluster) validateClusterInstancePoolTypes() error {
 		poolMap = map[string]bool{
 			clusterv1alpha1.InstancePoolTypeVault:   true,
 			clusterv1alpha1.InstancePoolTypeBastion: true,
+			clusterv1alpha1.InstancePoolTypeJenkins: true,
 		}
 
 		break
@@ -284,6 +296,10 @@ func (c *Cluster) validateInstancePools() error {
 
 	// validate instance pool count according to cluster type
 	if err := c.validateClusterInstancePoolCount(); err != nil {
+		return err
+	}
+
+	if err := c.validateSubnets(); err != nil {
 		return err
 	}
 
@@ -484,6 +500,10 @@ func (c *Cluster) validateClusterAutoscaler() (result error) {
 		if (c.Config().Kubernetes.ClusterAutoscaler.Overprovisioning.Image != "" || c.Config().Kubernetes.ClusterAutoscaler.Overprovisioning.Version != "") && (c.Config().Kubernetes.ClusterAutoscaler.Overprovisioning.CoresPerReplica == 0 && c.Config().Kubernetes.ClusterAutoscaler.Overprovisioning.NodesPerReplica == 0) {
 			return fmt.Errorf("setting overprovisioning image or version is only valid when proportional overprovisioning is enabled")
 		}
+
+		if s := c.Config().Kubernetes.ClusterAutoscaler.ScaleDownThreshold; s != nil && (*s < 0 || *s > 1) {
+			return fmt.Errorf("scale down threshold '%v' unacceptable, must be value between 0 and 1", *c.Config().Kubernetes.ClusterAutoscaler.ScaleDownThreshold)
+		}
 	}
 
 	return nil
@@ -495,6 +515,25 @@ func (c *Cluster) validateAPIServer() (result error) {
 		_, _, err := net.ParseCIDR(cidr)
 		if err != nil {
 			result = multierror.Append(result, fmt.Errorf("%s is not a valid CIDR format", cidr))
+		}
+	}
+
+	if a := c.Config().Kubernetes.APIServer.Amazon; a != nil {
+		for _, l := range []*clusterv1alpha1.ClusterKubernetesAPIServerAmazonAccessLogs{
+			a.PublicELBAccessLogs,
+			a.InternalELBAccessLogs,
+		} {
+
+			if l != nil && *l.Enabled {
+				if len(l.Bucket) == 0 {
+					result = multierror.Append(result, errors.New("access logs enabled with no bucket name"))
+				}
+
+				if *l.Interval != 5 && *l.Interval != 60 {
+					result = multierror.Append(result, errors.New("access logs interval may only be a value of 5 or 60"))
+				}
+			}
+
 		}
 	}
 
@@ -734,6 +773,30 @@ func (c *Cluster) Variables() map[string]interface{} {
 		output["private_zone"] = privateZone
 	}
 
+	// Get enabled elb access logs
+	if k := c.Config().Kubernetes; k != nil && k.APIServer != nil && k.APIServer.Amazon != nil {
+		if p := k.APIServer.Amazon.PublicELBAccessLogs; p != nil {
+			output["elb_access_logs_public_enabled"] = fmt.Sprintf("%v", *p.Enabled)
+			output["elb_access_logs_public_bucket"] = p.Bucket
+			output["elb_access_logs_public_bucket_prefix"] = p.BucketPrefix
+			output["elb_access_logs_public_bucket_interval"] = *p.Interval
+		} else {
+			output["elb_access_logs_public_enabled"] = "false"
+		}
+
+		if i := k.APIServer.Amazon.InternalELBAccessLogs; i != nil {
+			output["elb_access_logs_internal_enabled"] = fmt.Sprintf("%v", *i.Enabled)
+			output["elb_access_logs_internal_bucket"] = i.Bucket
+			output["elb_access_logs_internal_bucket_prefix"] = i.BucketPrefix
+			output["elb_access_logs_internal_bucket_interval"] = *i.Interval
+		} else {
+			output["elb_access_logs_internal_enabled"] = "false"
+		}
+	} else {
+		output["elb_access_logs_public_enabled"] = "false"
+		output["elb_access_logs_internal_enabled"] = "false"
+	}
+
 	output["name"] = c.Name()
 
 	return output
@@ -782,4 +845,30 @@ func (c *Cluster) PublicAPIHostname() string {
 		c.Name(),
 		c.Environment().Provider().PublicZone(),
 	)
+}
+
+func (c *Cluster) validateSubnets() error {
+	var result *multierror.Error
+
+	if c.Type() == clusterv1alpha1.ClusterTypeClusterMulti && c.Environment().Hub() != nil {
+		hSubnets := c.Environment().Hub().Subnets()
+
+		for _, cNet := range c.Subnets() {
+			found := false
+
+			for _, hNet := range hSubnets {
+				if cNet.Zone == hNet.Zone {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				err := fmt.Errorf("hub cluster does not include zone '%s'", cNet.Zone)
+				result = multierror.Append(result, err)
+			}
+		}
+	}
+
+	return result.ErrorOrNil()
 }

@@ -27,6 +27,21 @@ func SetObjectDefaults_Cluster(in *Cluster) {
 		a := &in.InstancePools[i]
 		SetObjectDefaults_InstancePool(a)
 	}
+	if in.Kubernetes != nil {
+		if in.Kubernetes.ClusterAutoscaler != nil {
+			SetDefaults_ClusterKubernetesClusterAutoscaler(in.Kubernetes.ClusterAutoscaler)
+		}
+		if in.Kubernetes.APIServer != nil {
+			if in.Kubernetes.APIServer.Amazon != nil {
+				if in.Kubernetes.APIServer.Amazon.PublicELBAccessLogs != nil {
+					SetDefaults_ClusterKubernetesAPIServerAmazonAccessLogs(in.Kubernetes.APIServer.Amazon.PublicELBAccessLogs)
+				}
+				if in.Kubernetes.APIServer.Amazon.InternalELBAccessLogs != nil {
+					SetDefaults_ClusterKubernetesAPIServerAmazonAccessLogs(in.Kubernetes.APIServer.Amazon.InternalELBAccessLogs)
+				}
+			}
+		}
+	}
 }
 
 func SetObjectDefaults_ClusterList(in *ClusterList) {

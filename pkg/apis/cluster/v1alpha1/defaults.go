@@ -116,6 +116,10 @@ func boolPointer(x bool) *bool {
 	return &x
 }
 
+func floatPointer(x float64) *float64 {
+	return &x
+}
+
 func allocateAmazonESProxyPort(loggingSinks []*LoggingSink) int {
 
 	allocatedPorts := make(map[int]struct{})
@@ -169,5 +173,26 @@ func SetDefaults_InstancePool(obj *InstancePool) {
 		if obj.Volumes[pos].Type == "" {
 			obj.Volumes[pos].Type = VolumeTypeSSD
 		}
+	}
+}
+
+func SetDefaults_ClusterKubernetesAPIServerAmazonAccessLogs(obj *ClusterKubernetesAPIServerAmazonAccessLogs) {
+	if obj.Enabled == nil {
+		if len(obj.Bucket) > 0 {
+			obj.Enabled = boolPointer(true)
+		} else {
+			obj.Enabled = boolPointer(false)
+		}
+	}
+
+	if obj.Interval == nil {
+		in := 5
+		obj.Interval = &in
+	}
+}
+
+func SetDefaults_ClusterKubernetesClusterAutoscaler(obj *ClusterKubernetesClusterAutoscaler) {
+	if obj.ScaleDownThreshold == nil {
+		obj.ScaleDownThreshold = floatPointer(0.5)
 	}
 }
