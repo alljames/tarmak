@@ -113,9 +113,7 @@ variable "vault_root_size" {
 variable "vault_data_size" {
   default = "10"
 }
-variable "vault_volume_encrypted" {}
 variable "vault_min_instance_count" {}
-
 variable "vault_instance_type" {
   default = "{{ .VaultInstancePool.InstanceType }}"
 }

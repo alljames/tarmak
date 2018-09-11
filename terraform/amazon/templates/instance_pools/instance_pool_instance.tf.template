@@ -75,7 +75,10 @@ resource "aws_launch_configuration" "{{.TFName}}" {
     device_name       = "{{.Device}}"
     volume_size       = {{.Size}}
     volume_type       = "{{.Type}}"
-    volume_encrypted  = "{{.Encrypted}}"
+    volume_encrypted  = "{{.EBSEncrypted}}"
+    # Terraform does not support booleans as first class types (yet)
+    # https://www.terraform.io/docs/configuration/variables.html#booleans
+    # "The false is converted to a string "0" when running Terraform."
   }
 {{ end -}}
 
@@ -223,7 +226,7 @@ resource "aws_ebs_volume" "{{$instancePool.TFName}}_{{.Name}}" {
   availability_zone = "${element(var.availability_zones, count.index)}"
   size              = "${var.{{$instancePool.TFName}}_{{.Name}}_volume_size}"
   type              = "${var.{{$instancePool.TFName}}_{{.Name}}_volume_type}"
-  encrypted         = "${var.{{$instancePool.TFName}}_{{.Name}}_volume_encrypted}"
+  encrypted         = "{{.EBSEncrypted}}"
 
   tags {
     Name        = "${data.template_file.stack_name.rendered}-{{$instancePool.DNSName}}-{{.Name}}-${count.index+1}"
