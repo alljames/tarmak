@@ -11,8 +11,6 @@ import (
 	tarmakv1alpha1 "github.com/jetstack/tarmak/pkg/apis/tarmak/v1alpha1"
 )
 
-// TODO: Aled - https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-images.html
-// github.com/jetstack/tarmak/vendor/github.com/aws/aws-sdk-go/service/ec2/api.go#44887
 func (a *Amazon) QueryImages(tags map[string]string) (images []tarmakv1alpha1.Image, err error) {
 
 	sess, err := a.Session()

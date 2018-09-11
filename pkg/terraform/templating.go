@@ -156,6 +156,8 @@ func (t *terraformTemplate) Generate() error {
 
 func (t *terraformTemplate) data(module string) map[string]interface{} {
 
+	var ebsEncrypted bool
+
 	_, existingVPC := t.cluster.Config().Network.ObjectMeta.Annotations[clusterv1alpha1.ExistingVPCAnnotationKey]
 
 	jenkinsCertificateARN := ""
@@ -168,13 +170,17 @@ func (t *terraformTemplate) data(module string) map[string]interface{} {
 		}
 	}
 
+	if t.cluster.Config().Amazon != nil && t.cluster.Config().Amazon.EBSEncrypted != nil {
+		ebsEncrypted = *t.cluster.Config().Amazon.EBSEncrypted
+	}
+
 	return map[string]interface{}{
 		"ClusterTypeClusterSingle": clusterv1alpha1.ClusterTypeClusterSingle,
 		"ClusterTypeHub":           clusterv1alpha1.ClusterTypeHub,
 		"ClusterTypeClusterMulti":  clusterv1alpha1.ClusterTypeClusterMulti,
 		"ClusterType":              t.cluster.Type(),
 		"InstancePools":            t.cluster.InstancePools(),
-		"EBSEncrypted":             *t.cluster.Config().Amazon.EBSEncrypted,
+		"EBSEncrypted":             ebsEncrypted,
 		"ExistingVPC":              existingVPC,
 		// cluster.Roles() returns a list of roles based off of the types of instancePools in tarmak.yaml
 		"Roles":                 t.cluster.Roles(),

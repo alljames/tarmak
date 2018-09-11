@@ -43,7 +43,7 @@ func (i *image) userVariables() map[string]string {
 		tarmakv1alpha1.ImageTagEnvironment:   i.environment,
 		tarmakv1alpha1.ImageTagBaseImageName: i.imageName,
 		"region":                             i.tarmak.Provider().Region(),
-		"ebs_volume_encrypted":               fmt.Sprintf("%v", *i.tarmak.Cluster().Config().Amazon.EBSEncrypted),
+		"ebs_volume_encrypted":               fmt.Sprintf("%v", i.isEncrypted()),
 	}
 }
 
@@ -161,4 +161,14 @@ func (i *image) Build() (amiID string, err error) {
 	wg.Wait()
 
 	return strings.Join(amiIDs, ", "), result.ErrorOrNil()
+}
+
+func (i *image) isEncrypted() bool {
+	var ebsEncrypted bool
+
+	if i.tarmak.Cluster().Config().Amazon != nil && i.tarmak.Cluster().Config().Amazon.EBSEncrypted == nil {
+		ebsEncrypted = *i.tarmak.Cluster().Config().Amazon.EBSEncrypted
+	}
+
+	return ebsEncrypted
 }
