@@ -85,3 +85,4 @@ millicores
 yaml
 autoscale
 Grafana
+EBS
