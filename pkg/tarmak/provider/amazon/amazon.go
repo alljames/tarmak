@@ -294,11 +294,21 @@ func (a *Amazon) Environment() ([]string, error) {
 		return []string{}, fmt.Errorf("error getting credentials: %s", err)
 	}
 
+	ebsEncrypted := fmt.Sprint(*a.tarmak.Cluster().Config().Amazon.EBSEncrypted)
+
+	if a.tarmak.Cluster().Config().Amazon != nil &&
+		a.tarmak.Cluster().Config().Amazon.EBSEncrypted != nil {
+		if a.tarmak.Cluster().Config().Amazon.EBSEncrypted != nil {
+			fmt.Printf("Debugging: EBS_VOLUME_ENCRYPTED=%v\n", ebsEncrypted)
+		}
+	}
+
 	return []string{
 		fmt.Sprintf("AWS_ACCESS_KEY_ID=%s", creds.AccessKeyID),
 		fmt.Sprintf("AWS_SECRET_ACCESS_KEY=%s", creds.SecretAccessKey),
 		fmt.Sprintf("AWS_SESSION_TOKEN=%s", creds.SessionToken),
 		fmt.Sprintf("AWS_DEFAULT_REGION=%s", a.Region()),
+		fmt.Sprintf("EBS_VOLUME_ENCRYPTED=%s", ebsEncrypted),
 	}, nil
 }
 
@@ -521,6 +531,7 @@ func (a *Amazon) vaultSession() (*session.Session, error) {
 	return sess, nil
 }
 
+// TODO: 459
 func (a *Amazon) VerifyInstanceTypes(instancePools []interfaces.InstancePool) error {
 	var result error
 
@@ -543,6 +554,7 @@ func (a *Amazon) VerifyInstanceTypes(instancePools []interfaces.InstancePool) er
 	return result
 }
 
+// TODO: 459
 func (a *Amazon) verifyInstanceType(instanceType string, zones []string, svc EC2) error {
 	var result error
 	var available bool

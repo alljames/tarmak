@@ -11,6 +11,7 @@ import (
 	tarmakv1alpha1 "github.com/jetstack/tarmak/pkg/apis/tarmak/v1alpha1"
 )
 
+// TODO: 459
 func (a *Amazon) QueryImages(tags map[string]string) (images []tarmakv1alpha1.Image, err error) {
 
 	sess, err := a.Session()

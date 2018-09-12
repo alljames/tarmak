@@ -68,6 +68,7 @@ resource "aws_launch_configuration" "{{.TFName}}" {
   root_block_device {
     volume_type = "${var.{{.TFName}}_root_volume_type}"
     volume_size = "${var.{{.TFName}}_root_volume_size}"
+    encrypted   = "{{.Encrypted}}"
   }
 
 {{ range .Volumes -}}

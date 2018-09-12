@@ -20,6 +20,10 @@ variable "{{.TFName}}_root_volume_type" {
   default = "gp2"
 }
 
+variable "{{.TFName}}_root_volume_encrypted" {
+  default = "{{.EBSEncrypted}}"
+}
+
 variable "{{.TFName}}_spot_price" {
   default = "{{.SpotPrice}}"
 }
@@ -35,5 +39,8 @@ variable "{{$instancePool.TFName}}_{{.Name}}_volume_size" {
 }
 variable "{{$instancePool.TFName}}_{{.Name}}_volume_type" {
   default = "{{.Type}}"
+}
+variable "{{$instancePool.TFName}}_{{.Name}}_encrypted" {
+  default = "{{.EBSEncrypted}}"
 }
 {{ end }}
